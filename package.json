@@ -1,0 +1,11 @@
+{
+  "name": "offer-underway-jobs",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "refresh": "node scripts/refresh-jobs.mjs",
+    "refresh:publish": "node scripts/refresh-jobs.mjs --publish",
+    "test": "node --test scripts/__tests__/*.test.mjs"
+  }
+}

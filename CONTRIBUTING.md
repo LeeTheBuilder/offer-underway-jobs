@@ -1,39 +1,72 @@
-# Maintaining the job list
+# Refreshing the job list
 
-Update `README.md` manually. This starter repository has no scheduled workflow, crawler, or connection to a private database.
+Run these commands from this repository. Node.js 20 or newer is required. There are no npm dependencies to install.
 
-## Add a role
+```bash
+# Preview counts without changing files
+npm run refresh -- --dry-run
 
-1. Find a real role on Offer Underway and confirm its company, title, location, work arrangement, and posting date.
-2. Use the canonical posting identifier from that role. Do not publish a user-specific lead, profile, application, match score, or private account URL.
-3. Link the job title to the corresponding Offer Underway detail page. Open the final URL and confirm the company and title match before adding the row. Do not substitute an employer or ATS application URL, or link a specific title to a generic search page.
-4. Add the row between `JOBS_TABLE_START` and `JOBS_TABLE_END`, newest posting date first. Use `Not specified` for missing details; do not use the update date as the posting date. Escape table pipes as `\|`.
-5. Replace the starter-edition notice when real listings are present, update the list's review date, and add a short entry under Updates. Remove closed roles when reviewing the list.
+# Refresh the local README and public listing data
+npm run refresh
 
-### Job link format
+# Refresh, commit the generated files, and push to GitHub
+npm run refresh:publish
+```
 
-The website supports canonical posting links in this form:
+Updates run only when you invoke a command. No daily schedule or GitHub Actions workflow is configured.
+
+## Data access
+
+The refresh command uses the existing `infra/scripts/prod-psql-prod.sh` helper in an authorised Offer Underway application checkout. By default, it looks for a sibling directory named `career-ops-chn`. For a different location:
+
+```bash
+npm run refresh -- --source-repo /path/to/career-ops-chn
+```
+
+The helper requires its existing deployment configuration, authenticated `gcloud`, Cloud SQL Auth Proxy, `psql`, and Python 3. Credentials remain in that private environment. No credentials or deployment configuration belong in this repository.
+
+The query is a read-only transaction with a 30-second statement timeout. It reads canonical job postings and public crawler provenance; it does not read user profiles, applications, recommendations, or private lead records. The temporary query output is removed on completion or failure.
+
+## Selection
+
+Defaults: **50 jobs**, posted or first discovered within **14 days**, with at most **3 roles per company**. All locations are eligible. By default, titles must match software, data, AI, product, UX/design, cloud, platform, security, or testing keywords.
+
+```bash
+npm run refresh -- --limit 100 --days 30 --per-company 5
+
+# Choose a different campaign focus (comma-separated literal title phrases)
+npm run refresh -- --keywords "software,developer,data engineer"
+```
+
+A role must have been seen through a direct employer feed in the last three days, have an HTTPS source URL, and not be marked expired. The latest stored liveness observation must not report it closed. Job-board-only and user-import-only postings are excluded. This uses existing catalogue evidence; the refresh does not recrawl every employer or guarantee that a listing remains open.
+
+The script considers the latest 2,000 eligible candidates, removes duplicate posting IDs and equivalent company/title/location rows, applies the company cap, and orders the result by posting date. It may publish fewer than the requested count when insufficient unique roles qualify. Empty results or invalid records fail without replacing the existing list.
+
+Posting dates come from the source field. Missing dates, locations, or work arrangements are displayed as `Not specified`; discovery dates never become posting dates. The refresh date uses Australia/Melbourne time; posting dates use the stored source timestamp in UTC.
+
+## Generated content and links
+
+- `data/jobs.json`: only canonical posting ID, company, title, location, work model, posting date, and the refresh date.
+- `README.md`: only the summary, table, and latest-update blocks delimited by `JOBS_SUMMARY`, `JOBS_TABLE`, and `JOBS_UPDATE` comments. Keep those markers intact. Git history retains previous lists.
+
+Every job-title link is generated from a canonical posting ID:
 
 ```text
 https://offerunderway.com/job-leads/posting%3A{POSTING_ID}?from=search&utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=job_title
 ```
 
-Replace `{POSTING_ID}` with the real canonical posting ID. The placeholder is documentation only and must never be published as a live listing. Verify the full link in the website before use; the skeleton does not establish availability of any individual job.
+Company names are plain text. Employer and ATS URLs are never used as campaign destinations. The website can require sign-in to view role details.
 
-### Row format
+The brand graphics and browse buttons remain hand-maintained. Browse links use `https://offerunderway.com/job-leads?tab=search` with the same campaign parameters. In HTML attributes, encode `&` as `&amp;`.
 
-```markdown
-| **Company name** | **[Job title](VERIFIED_OFFER_UNDERWAY_DETAIL_URL)** | City, Country | Remote / Hybrid / On Site / Not specified | YYYY-MM-DD / Not specified |
+## Publishing and validation
+
+`npm run refresh` changes local files only. Review them with `git diff -- README.md data/jobs.json`. `npm run refresh:publish` performs another live refresh and publishes its results; it requires `main`, the expected campaign remote, no pre-staged changes, and no other modified tracked files. It commits only `README.md` and `data/jobs.json`, and skips the commit when nothing changed. If a push fails, the local commit remains available to retry with `git push origin main`.
+
+Run the focused tests after changing the script:
+
+```bash
+npm test
 ```
 
-Company names are plain text so all job-related click-throughs stay on Offer Underway. For multiple consecutive roles at the same company, `↳` can replace the repeated company name.
-
-## Campaign links and artwork
-
-Use `https://offerunderway.com/job-leads?tab=search` for browse links. Include `utm_source=github`, `utm_medium=repository`, and `utm_campaign=offer_underway_jobs`; use `utm_content` to distinguish placements. In HTML attributes, encode `&` as `&amp;`.
-
-The images in `static/img/` use Offer Underway's public wordmark and jade palette. Keep the visible brand, alternative text, and destinations consistent. Contact: admin@offerunderway.com.
-
-## Automation
-
-Daily updates are intentionally not configured. Adding a schedule or a publishing pipeline is a separate future change.
+For listing corrections, open an issue or contact admin@offerunderway.com. Fix incorrect source metadata in the catalogue so a later refresh does not reintroduce it.
