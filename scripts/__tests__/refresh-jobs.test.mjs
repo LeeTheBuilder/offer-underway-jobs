@@ -18,9 +18,11 @@ test('only projects public fields and never consumes source URLs or user data', 
   assert.doesNotMatch(output, /employer\.invalid|synthetic@example|SYNTHETIC_PRIVATE/);
   const url = new URL(jobUrl(id(1)));
   assert.equal(url.origin, 'https://offerunderway.com');
-  assert.equal(decodeURIComponent(url.pathname), `/job-leads/posting:${id(1)}`);
-  assert.equal(url.searchParams.get('from'), 'search');
-  assert.equal(url.searchParams.get('utm_source'), 'github');
+  assert.equal(url.pathname, `/jobs/info/${id(1)}`);
+  assert.deepEqual(Object.fromEntries(url.searchParams), {
+    utm_source: 'github', utm_medium: 'repository',
+    utm_campaign: 'offer_underway_jobs', utm_content: 'job_title'
+  });
 });
 
 test('deduplicates IDs and same role/location while retaining distinct locations and limiting companies', () => {

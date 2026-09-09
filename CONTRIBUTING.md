@@ -52,10 +52,10 @@ Posting dates come from the source field. Missing dates, locations, or work arra
 Every job-title link is generated from a canonical posting ID:
 
 ```text
-https://offerunderway.com/job-leads/posting%3A{POSTING_ID}?from=search&utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=job_title
+https://offerunderway.com/jobs/info/{POSTING_ID}?utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=job_title
 ```
 
-Company names are plain text. Employer and ATS URLs are never used as campaign destinations. The website can require sign-in to view role details.
+Company names are plain text. Employer and ATS URLs are never used as campaign destinations. Signed-out visitors can read the public job page; Apply and feature buttons lead to signup. Signed-in visitors are redirected to the same job in their existing workspace. The public frontend route and API must be deployed before publishing these links.
 
 The brand graphics and browse buttons remain hand-maintained. Browse links use `https://offerunderway.com/job-leads?tab=search` with the same campaign parameters. In HTML attributes, encode `&` as `&amp;`.
 

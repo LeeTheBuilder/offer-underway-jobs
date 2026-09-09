@@ -42,7 +42,7 @@ function workModel(value) {
 }
 export function jobUrl(id) {
   if (!UUID.test(id)) throw new Error('Invalid canonical posting ID.');
-  return `https://offerunderway.com/job-leads/${encodeURIComponent(`posting:${id}`)}?from=search&utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=job_title`;
+  return `https://offerunderway.com/jobs/info/${encodeURIComponent(id)}?utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=job_title`;
 }
 export function prepareJobs(input, { limit = 50, perCompany = 3 } = {}) {
   const updatedAt = date(input.updatedAt);
