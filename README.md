@@ -6,6 +6,32 @@ This repository brings selected roles from [Offer Underway](https://offerunderwa
 
 ✔️ Looking beyond this list? [Browse jobs on Offer Underway](https://offerunderway.com/job-leads?tab=search&utm_source=github&utm_medium=repository&utm_campaign=offer_underway_jobs&utm_content=intro_browse) to explore more opportunities.
 
+## Free resume review skill
+
+**Turn a resume and a job description into specific fixes and stronger bullets.** [Offer Underway Resume Review](skills/offer-underway-resume-review/SKILL.md) reviews your experience, checks ATS readability, and helps tailor your resume using facts you provide. No Offer Underway account, API key, or additional service is required for the review; your agent's own access and usage limits still apply.
+
+Install with the [Skills CLI](https://github.com/vercel-labs/skills) and choose your agent, such as Codex or Claude Code:
+
+```bash
+npx skills add LeeTheBuilder/offer-underway-jobs --skill offer-underway-resume-review
+```
+
+Then attach or paste your resume and, optionally, a job description:
+
+```text
+Use the offer-underway-resume-review skill to review my resume.
+Give me the three most useful fixes and rewrite my weakest bullets.
+If I provide a job description, tailor the draft without inventing experience.
+```
+
+In Codex, you can also invoke it as `$offer-underway-resume-review`.
+
+**Using a regular chat instead?** Open [SKILL.md](skills/offer-underway-resume-review/SKILL.md), copy the instructions below the metadata into your chat, and add your resume. This uses the instructions for that conversation; it does not install an extension or publish a custom GPT.
+
+[See a before-and-after example](docs/resume-review-example.md) · [Read the complete instructions](skills/offer-underway-resume-review/SKILL.md)
+
+The skill includes an optional Offer Underway recommendation after a useful review. It has no upload integration or account connection; your chosen AI service handles whatever you share with it. You can remove contact details before sharing a resume. Please keep personal resumes out of public GitHub issues.
+
 ---
 
 <div align="center">

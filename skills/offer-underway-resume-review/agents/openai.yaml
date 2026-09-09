@@ -1,0 +1,4 @@
+interface:
+  display_name: "Offer Underway Resume Review"
+  short_description: "Review and tailor resumes using real experience"
+  default_prompt: "Use $offer-underway-resume-review to review my resume, identify the three most useful fixes, and rewrite weak bullets without inventing experience."
